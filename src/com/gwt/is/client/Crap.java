@@ -1,7 +1,9 @@
 package com.gwt.is.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
@@ -26,71 +28,88 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 
-
 public class Crap implements EntryPoint {
-	
+
 	private static class MyDataProvider extends AsyncDataProvider<String> {
-	    @Override
-	    protected void onRangeChanged(HasData<String> display) {
-	    	updateRowData(0, DATA);
-	    }
+		@Override
+		protected void onRangeChanged(HasData<String> display) {
+			updateRowData(0, new ArrayList<String>(DATA.values()));
+		}
 	}
-	
-	private final static List<String> DATA = new ArrayList<String>();
-	
+
+	private static Map<Integer, String> DATA = new HashMap<Integer, String>();
+
 	private final MyDataProvider dataProvider = new MyDataProvider();
-	
+
 	private final TextBox valueField = new TextBox();
 
 	private final Button editButton = new Button("Update");
 	private final Button addButton = new Button("Create");
 	private final Button removeButton = new Button("Delete");
 
-	//private final CellList<String> cellList = new CellList<String>(new TextCell());
-	
 	private final CellTable<String> table = new CellTable<String>();
-	
-	
-	
+
 	private final CRUDServiceAsync crud = GWT.create(CRUDService.class);
-	 
-    
+
+	private void refreshList() {
+		AsyncCallback<Map<Integer, String>> callback = new AsyncCallback<Map<Integer, String>>() {
+			public void onFailure(Throwable caught) {
+				// TODO: Do something with errors.
+			}
+
+			@Override
+			public void onSuccess(Map<Integer, String> result) {
+				// TODO Auto-generated method stub
+				DATA = result;
+				dataProvider.updateRowData(0, new ArrayList<String>(result.values()));
+				dataProvider.updateRowCount(result.values().size(), true);
+			}
+		};
+		crud.getList(callback);
+	}
+
 	@Override
 	public void onModuleLoad() {
-	
+
 		valueField.addStyleName("form-control");
 		valueField.getElement().setAttribute("placeholder", "Enter news");
-		valueField.getElement().setAttribute("aria-describedby", "basic-addon1");
-		
+		valueField.getElement()
+				.setAttribute("aria-describedby", "basic-addon1");
+
 		RootPanel.get("inputs").add(valueField);
-		
+
 		editButton.addStyleName("btn btn-success");
 		editButton.removeStyleName("gwt-Button");
 		editButton.setText("Create");
-		
+
 		RootPanel.get("buttons").add(editButton);
-		
+
 		addButton.addStyleName("btn btn-warning");
 		addButton.removeStyleName("gwt-Button");
 		addButton.setText("Update");
-		
+
 		RootPanel.get("buttons").add(addButton);
-		
+
 		removeButton.addStyleName("btn btn-danger");
 		removeButton.removeStyleName("gwt-Button");
 		removeButton.setText("Delete");
-		
+
 		RootPanel.get("buttons").add(removeButton);
-		
+
 		table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
-		
-		TextColumn<String> stringColumn = new TextColumn<String>(){
+
+		TextColumn<String> stringColumn = new TextColumn<String>() {
 			@Override
-			public String getValue(String obj){
+			public String getValue(String obj) {
 				return obj;
 			}
 		};
-		
+
 		table.addColumn(stringColumn, "News");
+		dataProvider.addDataDisplay(table);
+		
+		refreshList();
+
+		RootPanel.get("list").add(table);
 	}
 }

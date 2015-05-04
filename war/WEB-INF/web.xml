@@ -11,5 +11,15 @@
   <welcome-file-list>
     <welcome-file>Crap.html</welcome-file>
   </welcome-file-list>
+  
+  <servlet>
+    <servlet-name>CRUDServiceServer</servlet-name>
+    <servlet-class>com.gwt.is.server.CRUDServiceServer</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>CRUDServiceServer</servlet-name>
+    <url-pattern>/crap/crud</url-pattern>
+  </servlet-mapping>
 
 </web-app>
