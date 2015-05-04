@@ -7,16 +7,16 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <script src="crap/jquery/jquery-1.11.2.min.js"></script>
 
     <!--                                                               -->
     <!-- Consider inlining CSS to reduce the number of requested files -->
     <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="Crap.css">
-
     <!--                                           -->
     <!-- Any title is fine                         -->
     <!--                                           -->
-    <title>Web Application Starter Project</title>
+    <title>TWITTER 2.0</title>
     
     <!--                                           -->
     <!-- This script loads your compiled module.   -->
@@ -24,6 +24,15 @@
     <!-- be added before this line.                -->
     <!--                                           -->
     <script type="text/javascript" language="javascript" src="crap/crap.nocache.js"></script>
+    
+    <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="crap/bootstrap/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="crap/bootstrap/css/bootstrap-theme.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="crap/bootstrap/js/bootstrap.min.js"></script>
   </head>
 
   <!--                                           -->
@@ -43,20 +52,23 @@
         in order for this application to display correctly.
       </div>
     </noscript>
-
-    <h1>Web Application Starter Project</h1>
-
-    <table align="center">
-      <tr>
-        <td colspan="2" style="font-weight:bold;">Please enter your name:</td>        
-      </tr>
-      <tr>
-        <td id="nameFieldContainer"></td>
-        <td id="sendButtonContainer"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
-      </tr>
-    </table>
+	<div class="container">
+		<div class="page-header">
+			<div class="jumbotron">
+    			<h1>Twitter 2.0</h1>
+			</div>
+		</div>
+		<div class="panel panel-default">
+		  	<div class="panel-body">
+		    	<div class="panel panel-default">
+		    		<div id="inputs" class="panel-body"></div>
+		    		<div id="buttons" class="panel-body"></div>
+		    	</div>
+		    	<div class="panel panel-default">
+		    		<div id="list" class="panel-body"></div>
+		    	</div>
+			</div>
+		</div>
+    </div>
   </body>
 </html>
