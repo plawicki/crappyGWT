@@ -27,17 +27,20 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 public class Crap implements EntryPoint {
 
 	private static class MyDataProvider extends AsyncDataProvider<String> {
 		@Override
 		protected void onRangeChanged(HasData<String> display) {
-			updateRowData(0, new ArrayList<String>(DATA.values()));
+			updateRowData(0, DATA);
 		}
 	}
 
-	private static Map<Integer, String> DATA = new HashMap<Integer, String>();
+	private static List<String> DATA = new ArrayList<String>();
 
 	private final MyDataProvider dataProvider = new MyDataProvider();
 
@@ -51,25 +54,80 @@ public class Crap implements EntryPoint {
 
 	private final CRUDServiceAsync crud = GWT.create(CRUDService.class);
 
+	private void onSuccessCallback(List<String> result) {
+		DATA = result;
+		dataProvider.updateRowData(0, result);
+		dataProvider.updateRowCount(result.size(), true);
+	}
+
 	private void refreshList() {
-		AsyncCallback<Map<Integer, String>> callback = new AsyncCallback<Map<Integer, String>>() {
+		AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 			public void onFailure(Throwable caught) {
 				// TODO: Do something with errors.
 			}
 
 			@Override
-			public void onSuccess(Map<Integer, String> result) {
-				// TODO Auto-generated method stub
-				DATA = result;
-				dataProvider.updateRowData(0, new ArrayList<String>(result.values()));
-				dataProvider.updateRowCount(result.values().size(), true);
+			public void onSuccess(List<String> result) {
+				onSuccessCallback(result);
 			}
 		};
 		crud.getList(callback);
 	}
 
+	private void create(String item) {
+		AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+			public void onFailure(Throwable caught) {
+				// TODO: Do something with errors.
+			}
+
+			public void onSuccess(List<String> result) {
+				onSuccessCallback(result);
+			}
+		};
+		crud.create(item, callback);
+	}
+
+	private void delete(int value) {
+		AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+			public void onFailure(Throwable caught) {
+				// TODO: Do something with errors.
+			}
+
+			public void onSuccess(List<String> result) {
+				onSuccessCallback(result);
+			}
+		};
+		crud.delete(value, callback);
+	}
+
+	private void update(String value, int key) {
+		AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+			public void onFailure(Throwable caught) {
+				// TODO: Do something with errors.
+			}
+
+			public void onSuccess(List<String> result) {
+				onSuccessCallback(result);
+			}
+		};
+		crud.update(value, key, callback);
+	}
+
 	@Override
 	public void onModuleLoad() {
+
+		final SingleSelectionModel<String> selectionModel = new SingleSelectionModel<String>();
+		selectionModel
+				.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+					public void onSelectionChange(SelectionChangeEvent event) {
+						String selected = selectionModel.getSelectedObject();
+						if (selected != null) {
+							valueField.setText(selected);
+						} else {
+							valueField.setText("");
+						}
+					}
+				});
 
 		valueField.addStyleName("form-control");
 		valueField.getElement().setAttribute("placeholder", "Enter news");
@@ -78,36 +136,60 @@ public class Crap implements EntryPoint {
 
 		RootPanel.get("inputs").add(valueField);
 
-		editButton.addStyleName("btn btn-success");
-		editButton.removeStyleName("gwt-Button");
-		editButton.setText("Create");
-
-		RootPanel.get("buttons").add(editButton);
-
-		addButton.addStyleName("btn btn-warning");
+		addButton.addStyleName("btn btn-success");
 		addButton.removeStyleName("gwt-Button");
-		addButton.setText("Update");
+		addButton.setText("Create");
+
+		addButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				create(valueField.getValue());
+				valueField.setText("");
+			}
+		});
 
 		RootPanel.get("buttons").add(addButton);
+
+		editButton.addStyleName("btn btn-warning");
+		editButton.removeStyleName("gwt-Button");
+		editButton.setText("Update");
+
+		editButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				update(valueField.getValue(), table.getKeyboardSelectedRow());
+				selectionModel.clear();
+			}
+		});
+
+		RootPanel.get("buttons").add(editButton);
 
 		removeButton.addStyleName("btn btn-danger");
 		removeButton.removeStyleName("gwt-Button");
 		removeButton.setText("Delete");
 
+		removeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				delete(table.getKeyboardSelectedRow());
+				selectionModel.clear();
+			}
+		});
+
 		RootPanel.get("buttons").add(removeButton);
 
 		table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
-
+		table.setSelectionModel(selectionModel);
 		TextColumn<String> stringColumn = new TextColumn<String>() {
 			@Override
 			public String getValue(String obj) {
 				return obj;
 			}
 		};
-
 		table.addColumn(stringColumn, "News");
+
 		dataProvider.addDataDisplay(table);
-		
+
 		refreshList();
 
 		RootPanel.get("list").add(table);

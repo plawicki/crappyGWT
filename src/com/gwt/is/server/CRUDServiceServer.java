@@ -1,5 +1,6 @@
 package com.gwt.is.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,31 +11,32 @@ import com.gwt.is.client.CRUDService;
 public class CRUDServiceServer extends RemoteServiceServlet implements CRUDService {
 	private static final long serialVersionUID = 1L;
 	
-	private Map<Integer, String> db = new HashMap<Integer, String>();
+	private List<String> db = new ArrayList<String>();
 	
 	@Override
-	public Map<Integer, String> getList() {
+	public List<String> getList() {
 		// TODO Auto-generated method stub
 		return db;
 	}
 
 	@Override
-	public Map<Integer, String> update(String value, int key) {
+	public List<String> update(String value, int key) {
 		// TODO Auto-generated method stub
+		db.set(key, value);
+		return db;
+	}
+
+	@Override
+	public List<String> delete(int key) {
 		db.remove(key);
-		db.put(key, value);
-		return db;
-	}
-
-	@Override
-	public Map<Integer, String> remove(int key) {
 		// TODO Auto-generated method stub
 		return db;
 	}
 
 	@Override
-	public Map<Integer, String> create(String newName) {
+	public List<String> create(String newName) {
 		// TODO Auto-generated method stub
+		db.add(newName);
 		return db;
 	}
 
